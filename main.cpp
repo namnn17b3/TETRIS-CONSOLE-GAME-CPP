@@ -599,6 +599,7 @@ void DrawLoGoGame() {
 void GamePlay() {
     quit_game = false;
     game_over = false;
+    minY = INT_MAX;
     SetConsoleOutputCP(65001);
     ShowCur(false);
     DisableSelection();
