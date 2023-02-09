@@ -1,0 +1,4 @@
+#ifndef _TETRIS_RC
+    #define _TETRIS_RC
+    MAINICON ICON "Tetris.ico"
+#endif
