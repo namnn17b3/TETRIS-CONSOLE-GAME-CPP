@@ -598,6 +598,7 @@ void DrawLoGoGame() {
 
 void GamePlay() {
     quit_game = false;
+    game_over = false;
     SetConsoleOutputCP(65001);
     ShowCur(false);
     DisableSelection();
