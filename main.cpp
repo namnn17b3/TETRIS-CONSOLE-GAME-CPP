@@ -487,7 +487,7 @@ void RePaint(vector<int> lines) {
     }
     Sleep(1000);
     for (int j = lines.back() - 1; j >= 1; j--) {
-        for (int i = 1; i <= WIDTH - 2; i++) {
+        for (int i = 1; i <= WIDTH - 2; i += 2) {
             if (board[i][j].first == 1) {
                 MoveDot(i, j);
             }
