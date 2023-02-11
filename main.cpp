@@ -414,7 +414,7 @@ void RotateCurrentShape() {
     }
 }
 
-void Insertboard() {
+void InsertBoard() {
     for (int i = 0; i < current_shape.size(); i++) {
         for (int j = 0; j < current_shape[0].size(); j++) {
             int x = current_shape[i][j][0];
@@ -441,24 +441,32 @@ void DeleteLine(int line) {
     }
 }
 
-void RePaint(int line) {
-    for (int j = line - 1; j >= 1; j--) {
+void RePaint(vector<int> lines) {
+    int step = lines.size();
+    SetColor(0, 0);
+    for (int j : lines) {
         for (int i = 1; i <= WIDTH - 2; i += 2) {
-            if (board[i][j].first == 1) {
-                board[i][j + 1].first = 1;
-                board[i][j + 1].second = board[i][j].second;
-                
-                board[i][j].first = 0;
-                board[i][j].second = 0;
-                
-                SetColor(board[i][j].second, 0);
-                Gotoxy(i, j);
-                cout << dot;
-                
-                SetColor(board[i][j + 1].second, 0);
-                Gotoxy(i, j + 1);
-                cout << dot;
-            }
+            Gotoxy(i, j);
+            cout << dot;
+        }
+    }
+    Sleep(1000);
+    for (int j = lines[0]; j >= step + 1; j--) {
+        for (int i = 1; i <= WIDTH - 2; i += 2) {
+            board[i][j].first = board[i][j - step].first;
+            board[i][j].second = board[i][j - step].second;
+            SetColor(board[i][j].second, 0);
+            Gotoxy(i, j);
+            cout << dot;
+        }
+    }
+    SetColor(0, 0);
+    for (int j = step; j >= 1; j--) {
+        for (int i = 1; i <= WIDTH - 2; i += 2) {
+            board[i][j].first = 0;
+            board[i][j].second = 0;
+            Gotoxy(i, j);
+            cout << dot;
         }
     }
 }
@@ -494,10 +502,7 @@ void CheckAllLine() {
             thread sound_effect(SoundEffect, "super_sound_effect.wav");
             sound_effect.detach();
         }
-        Sleep(1000);
-        for (int line : lines) {
-            RePaint(line);
-        }
+        RePaint(lines);
     }
 }
 
@@ -512,8 +517,9 @@ void DropCurrentShape() {
             }
         }
     }
-    Insertboard();
+    InsertBoard();
     DrawShape(current_shape, current_color);
+    Sleep(300);
     CheckAllLine();
 }
 
@@ -556,7 +562,7 @@ void MoveCurrentShape() {
             }
         }
         if (CanMoveY() == false) {
-            Insertboard();
+            InsertBoard();
             CheckAllLine();
             return;
         }
