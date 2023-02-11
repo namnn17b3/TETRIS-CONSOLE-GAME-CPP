@@ -88,7 +88,7 @@ vector<vector<vector<vector<int>>>> shapes = {
     },
 };
 vector<vector<int>> center = {
-    {21, 1}, {21, 1},{21, 2}, {21, 2}, {21, 1},
+    {21, 1}, {21, 1}, {21, 2}, {21, 2}, {21, 1},
     {21, 1}, {19, 2}, {19, 2}, {21, 2}, {21, 2},
     {21, 2}, {21, 2}, {21, 1}, {21, 2}, {19, 1},
     {21, 1}, {21, 1}, {21, 2}, {21, 2}
@@ -193,6 +193,13 @@ bool quit_game = false;
 string status[] = {"PLAYING...", "PAUSING...", "GAME OVER "};
 int score = 0;
 int high_score = 0;
+
+template<class T>
+void DeBug(T val) {
+    SetColor(0, 7);
+    Gotoxy(0, 0);
+    cout << val;
+}
 
 void GamePlay();
 
@@ -341,11 +348,21 @@ void RotateCurrentShape() {
         for (int i = 0; i < current_shape.size(); i++) {
             for (int j = 0; j < current_shape[0].size(); j++) {
                 if (current_shape[i][j][0] != _ && current_shape[i][j][1] != _) {
-                    current_shape[i][j][1]++;
+                    if (current_center[1] < y) {
+                        current_shape[i][j][1]++;
+                    }
+                    else if (current_center[1] > y) {
+                        current_shape[i][j][1]--;
+                    }
                 }
             }
         }
-        current_center[1]++;
+        if (current_center[1] < y) {
+            current_center[1]++;
+        }
+        else if (current_center[1] > y) {
+            current_center[1]--;
+        }
     }
     while (current_center[0] != x) {
         for (int i = 0; i < current_shape.size(); i++) {
@@ -441,32 +458,39 @@ void DeleteLine(int line) {
     }
 }
 
+void MoveDot(int x, int y) {
+    while (y + 1 <= HEIGHT - 2 && board[x][y + 1].first == 0 ) {
+        board[x][y].first = 0;
+        SetColor(0, 0);
+        Gotoxy(x, y);
+        cout << dot;
+        board[x][y + 1].first = 1;
+        board[x][y + 1].second = board[x][y].second;
+        board[x][y].second = 0;
+        SetColor(board[x][y + 1].second, 0);
+        Gotoxy(x, y + 1);
+        cout << dot;
+        y++;
+    }
+}
+
 void RePaint(vector<int> lines) {
     int step = lines.size();
     SetColor(0, 0);
     for (int j : lines) {
         for (int i = 1; i <= WIDTH - 2; i += 2) {
+            board[i][j].first = 0;
+            board[i][j].second = 0;
             Gotoxy(i, j);
             cout << dot;
         }
     }
     Sleep(1000);
-    for (int j = lines[0]; j >= step + 1; j--) {
-        for (int i = 1; i <= WIDTH - 2; i += 2) {
-            board[i][j].first = board[i][j - step].first;
-            board[i][j].second = board[i][j - step].second;
-            SetColor(board[i][j].second, 0);
-            Gotoxy(i, j);
-            cout << dot;
-        }
-    }
-    SetColor(0, 0);
-    for (int j = step; j >= 1; j--) {
-        for (int i = 1; i <= WIDTH - 2; i += 2) {
-            board[i][j].first = 0;
-            board[i][j].second = 0;
-            Gotoxy(i, j);
-            cout << dot;
+    for (int j = lines.back() - 1; j >= 1; j--) {
+        for (int i = 1; i <= WIDTH - 2; i++) {
+            if (board[i][j].first == 1) {
+                MoveDot(i, j);
+            }
         }
     }
 }
@@ -563,6 +587,7 @@ void MoveCurrentShape() {
         }
         if (CanMoveY() == false) {
             InsertBoard();
+            Sleep(300);
             CheckAllLine();
             return;
         }
